@@ -1,10 +1,23 @@
 Right now, there is a link to logout in the base template, but we have a bug here and the logout route logic is not implemented.
 
+### THINGS WE MIGHT WANT TO DO?
+
+1. pull g.user verification into its own func?
+
+####
+
+### THINGS TO WATCH!?
+
+ - unfollow button exists in two (?) places:
+    1. current user following page
+    2. followed user's detail page
+
+- Follow button appears on user profile AND in "following" page AND in "followers"
+
+###
 
 
 models.py
-
-
 
 app.py
 -Fixed minor typo in docstring for signup()
@@ -12,3 +25,12 @@ app.py
 
 base.html
 -Changed logout from GET to POST request by putting it in a CSRF form
+
+start_following()
+ - updated to include form validation logic
+
+ detail.html
+ - added csrf form field to follow button
+
+logout()
+ - changed abort(404) to show flashed message on form fail to match other routes
