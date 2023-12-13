@@ -29,16 +29,12 @@
               {% if g.user.is_following(user) %}
               <form method="POST"
                     action="/users/stop-following/{{ user.id }}">
-                <button class="btn btn-primary btn-sm">
-                  Unfollow
-                </button>
+                    {% include '/users/_unfollow_button.html' %}
               </form>
               {% else %}
               <form method="POST"
                     action="/users/follow/{{ user.id }}">
-                <button class="btn btn-outline-primary btn-sm">
-                  Follow
-                </button>
+                    {% include '/users/_follow_button.html' %}
               </form>
               {% endif %}
               {% endif %}
