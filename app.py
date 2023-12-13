@@ -251,22 +251,23 @@ def update_profile():
 
     form = UserUpdateForm(obj=g.user)
 
-    form.validate_on_submit():
-        g.user.username = form.username.data
-        g.user.email = form.email.data
-        g.user.image_url = form.image_url.data
-        g.user.header_image_url = form.header_image_url.data
-        g.user.bio = form.username.data
+    if form.validate_on_submit():
+        if User.authenticate(form.username.data, form.password.data):
+            g.user.username = form.username.data
+            g.user.email = form.email.data
+            g.user.image_url = form.image_url.data
+            g.user.header_image_url = form.header_image_url.data
+            g.user.bio = form.bio.data
 
-    """"
-    header_image_url = db.Column(
-        db.String(255),
-        nullable=False,
-        default=DEFAULT_HEADER_IMAGE_URL,
-    )
-    """
-        ...
-        return redirect(f'/users/{g.user.id}')
+            db.session.commit()
+
+            return redirect(f'/users/{g.user.id}')
+        else:
+            form.password.errors.append(ValueError("Invalid password!"))
+            # print("************ GOT HERE *****************")
+
+
+    return render_template('/users/edit.html', form=form)
 
 
 

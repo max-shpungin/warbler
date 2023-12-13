@@ -31,6 +31,8 @@ Right now, there is a link to logout in the base template, but we have a bug her
 
     bio and location are also missing.
 
+    Resolved: Changed Cancel button on edit form from user_id to g.user.id
+
 ###
 
 
