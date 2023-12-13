@@ -256,15 +256,21 @@ def delete_user():
 
     Redirect to signup page.
     """
-
+    #FIXME: CURRENTLY THROWING AN ERROR:
+    """
+    sqlalchemy.exc.IntegrityError: (psycopg2.errors.NotNullViolation) null
+    value in column "user_id" of relation "messages" violates not-null constraint
+    """
+    form = g.csrf_form
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    do_logout()
+    if form.validate_on_submit():
+        do_logout()
 
-    db.session.delete(g.user)
-    db.session.commit()
+        db.session.delete(g.user)
+        db.session.commit()
 
     return redirect("/signup")
 
