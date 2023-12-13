@@ -1,0 +1,7 @@
+Right now, there is a link to logout in the base template, but we have a bug here and the logout route logic is not implemented.
+
+
+
+models.py
+
+Users PK ID is not autoincrementing?
