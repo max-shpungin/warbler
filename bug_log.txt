@@ -5,3 +5,6 @@ Right now, there is a link to logout in the base template, but we have a bug her
 models.py
 
 Users PK ID is not autoincrementing?
+
+app.py
+-Fixed minor typo in docstring for signup()
