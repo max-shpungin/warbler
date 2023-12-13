@@ -17,6 +17,15 @@ Right now, there is a link to logout in the base template, but we have a bug her
 ###
 
 
+####BUGS
+
+Delete user breaks app
+
+Header hero image displaying weird
+
+###
+
+
 models.py
 
 app.py
@@ -34,3 +43,7 @@ start_following()
 
 logout()
  - changed abort(404) to show flashed message on form fail to match other routes
+
+start_following(),stop_following()
+refactored follow/unfollow buttons. These now live in separate templates and are
+referenced where needed in corresponding forms.
