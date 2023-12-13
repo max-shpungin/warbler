@@ -4,7 +4,11 @@ Right now, there is a link to logout in the base template, but we have a bug her
 
 models.py
 
-Users PK ID is not autoincrementing?
+
 
 app.py
 -Fixed minor typo in docstring for signup()
+-Modified /logout route to have logic around CSRF validation, and to actually log the user out
+
+base.html
+-Changed logout from GET to POST request by putting it in a CSRF form
