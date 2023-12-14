@@ -274,8 +274,17 @@ def update_profile():
 
     return render_template('/users/edit.html', form=form)
 
+@app.get('/users/<int:user_id>/likes')
+def show_liked_messages(user_id):
+    """Displays messages a user has liked."""
 
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
 
+    user = User.query.get_or_404(user_id)
+
+    return render_template('users/likes.html', user=user)
 
 @app.post('/users/delete')
 def delete_user():
@@ -382,11 +391,30 @@ def like_message(message_id):
         g.user.liked_messages.append(message)
         db.session.commit()
 
-        return redirect(f"/users/{g.user.id}/likes") #TODO: Write this
+        return redirect(f"/users/{g.user.id}/likes")
 
-@app.get('/users/<int:user_id>/likes')
-def show_liked_messages(user_id):
-    ...
+@app.post('/messages/<int:message_id>/unlike')
+def unlike_message(message_id):
+    """Like a message.
+
+    Check that the message was not written by the current user.
+    Redirect to liked messages page on success.
+    """
+
+    message = Message.query.get_or_404(message_id)
+
+    form = g.csrf_form
+
+    if not g.user or not form.validate_on_submit() or g.user.id == message.user_id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    else:
+        g.user.liked_messages.remove(message)
+        db.session.commit()
+
+        return redirect(f"/users/{g.user.id}/likes")
+
+
 
 
 
