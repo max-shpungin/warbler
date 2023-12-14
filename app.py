@@ -21,7 +21,7 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 toolbar = DebugToolbarExtension(app)
 
@@ -198,6 +198,18 @@ def show_followers(user_id):
     user = User.query.get_or_404(user_id)
     return render_template('users/followers.html', user=user)
 
+@app.get('/users/<int:user_id>/likes')
+def show_liked_messages(user_id):
+    """Displays messages a user has liked."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+
+    return render_template('users/likes.html', user=user)
+
 
 @app.post('/users/follow/<int:follow_id>')
 def start_following(follow_id):
@@ -274,17 +286,7 @@ def update_profile():
 
     return render_template('/users/edit.html', form=form)
 
-@app.get('/users/<int:user_id>/likes')
-def show_liked_messages(user_id):
-    """Displays messages a user has liked."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-
-    user = User.query.get_or_404(user_id)
-
-    return render_template('users/likes.html', user=user)
 
 @app.post('/users/delete')
 def delete_user():
