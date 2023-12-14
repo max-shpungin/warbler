@@ -63,7 +63,12 @@ class UserModelTestCase(TestCase):
         valid credentials
         """
 
-        u3 = User.signup("u3", "u3@email.com", "password", None)
+        u3 = User.signup(
+            "tuckerdiane",
+            "tuckerdiane@example.org",
+            "password",
+            None
+        )
         db.session.commit()
 
         self.assertTrue(u3)
@@ -80,18 +85,27 @@ class UserModelTestCase(TestCase):
         """Tests that signup method raises an error given no email and does not
         create a user"""
 
-
         with self.assertRaises(IntegrityError):
             u3 = User.signup("u3", None, "password", None)
             db.session.commit()
 
     def test_signup_negative_dupe(self):
+        """
+        Checks that a user signing up with an already in use username will
+        raise an error
+        """
+
         with self.assertRaises(IntegrityError):
             u3 = User.signup("u1", "u45@email.com", "passwordabc", None)
             db.session.commit()
 
 
     def test_default_values(self):
+        """
+        Ensures that the test user was assigned the default values for the
+        fields that were entered as None
+        """
+
         test_user = User.query.get(self.u1_id)
         self.assertEqual(test_user.image_url, DEFAULT_IMAGE_URL)
         self.assertEqual(test_user.header_image_url, DEFAULT_HEADER_IMAGE_URL)
@@ -100,6 +114,9 @@ class UserModelTestCase(TestCase):
 
 
     def test_is_following_positive(self):
+        """
+        Ensures that is_following returns True when a user is following another
+        """
         #someone needs to follow someone
 
         test_user_1 = User.query.get(self.u1_id)
@@ -111,20 +128,73 @@ class UserModelTestCase(TestCase):
         self.assertTrue(test_user_1.is_following(test_user_2))
 
     def test_is_following_negative(self):
-        ...
+        """
+        Ensures that is_following returns False when a user is not following
+        another
+        """
+
+        test_user_1 = User.query.get(self.u1_id)
+        test_user_2 = User.query.get(self.u2_id)
+
+        self.assertFalse(test_user_1.is_following(test_user_2))
 
     def test_is_followed_by_positive(self):
-        ...
+        """
+        Ensures that is_followed_by returns True when a user is followed by
+        another
+        """
+
+        test_user_1 = User.query.get(self.u1_id)
+        test_user_2 = User.query.get(self.u2_id)
+
+        test_user_1.following.append(test_user_2)
+        db.session.commit()
+
+        self.assertTrue(test_user_2.is_followed_by(test_user_1))
 
     def test_is_followed_by_negative(self):
-        ...
+        """
+        Ensures that is_followed_by returns False when a user is not followed
+        by another
+        """
+
+        test_user_1 = User.query.get(self.u1_id)
+        test_user_2 = User.query.get(self.u2_id)
+
+        self.assertFalse(test_user_1.is_followed_by(test_user_2))
 
 
     def test_authenticate_positive(self):
-        ...
+        """
+        Ensures that authenticate returns True when given the correct
+        credentials
+        """
+
+        test_user_1 = User.query.get(self.u1_id)
+
+        self.assertEqual(
+            test_user_1,
+            User.authenticate(test_user_1.username, test_user_1.password)
+        )
 
     def test_authenticate_negative_wrong_password(self):
-        ...
+        """
+        Ensures that authenticate returns False when given the incorrect
+        password
+        """
+
+        test_user_1 = User.query.get(self.u1_id)
+
+        self.assertFalse(User.authenticate(test_user_1.username, "asedfghklaf"))
 
     def test_authenticate_negative_wrong_username(self):
-        ...
+        """
+        Ensures that authenticate returns False when given the incorrect
+        username
+        """
+
+        test_user_1 = User.query.get(self.u1_id)
+
+        bad_username = test_user_1.username + "s"
+
+        self.assertFalse(User.authenticate(bad_username, test_user_1.password))
