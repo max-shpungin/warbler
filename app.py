@@ -247,24 +247,25 @@ def stop_following(follow_id):
 def update_profile():
     """Update profile for current user."""
 
-    # IMPLEMENT THIS
-
     form = UserUpdateForm(obj=g.user)
 
     if form.validate_on_submit():
-        if User.authenticate(form.username.data, form.password.data):
-            g.user.username = form.username.data
-            g.user.email = form.email.data
-            g.user.image_url = form.image_url.data
-            g.user.header_image_url = form.header_image_url.data
-            g.user.bio = form.bio.data
+        if User.authenticate(g.user.username, form.password.data):
+            try:
+                g.user.username = form.username.data
+                g.user.email = form.email.data
+                g.user.image_url = form.image_url.data
+                g.user.header_image_url = form.header_image_url.data
+                g.user.bio = form.bio.data
 
-            db.session.commit()
+                db.session.commit()
 
-            return redirect(f'/users/{g.user.id}')
+                return redirect(f'/users/{g.user.id}')
+            except IntegrityError:
+                db.session.rollback()
+                form.username.errors.append(ValueError("Name already taken!"))
         else:
             form.password.errors.append(ValueError("Invalid password!"))
-            # print("************ GOT HERE *****************")
 
 
     return render_template('/users/edit.html', form=form)
@@ -366,9 +367,15 @@ def homepage():
     """
 
     if g.user:
+
+        #Ids of users that logged in user is following
+        followed_user_ids = [user.id for user in g.user.following]
+
         #get all the messages by time stamp
         messages = (Message
                                 .query
+                                .filter((Message.user_id.in_(followed_user_ids))
+                                         | (Message.user_id == g.user.id))
                                 .order_by(Message.timestamp.desc())
                                 .limit(100)
                                 .all())
