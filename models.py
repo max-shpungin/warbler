@@ -97,6 +97,8 @@ class User(db.Model):
         backref="following",
     )
 
+    #Can access list of liked messages with .liked_messages
+
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
 
@@ -193,7 +195,7 @@ class Like(db.Model):
     """Connection of a message <-> liking_user."""
 
     __tablename__ = 'likes'
-
+    #For future reference, would be better to shorten names
     message_being_liked_id = db.Column(
         db.Integer,
         db.ForeignKey('messages.id', ondelete="cascade"),

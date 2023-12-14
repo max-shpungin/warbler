@@ -374,6 +374,7 @@ def delete_message(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+#TODO: Add new message for liking own messages
 @app.post('/messages/<int:message_id>/like')
 def like_message(message_id):
     """Like a message.
@@ -397,7 +398,7 @@ def like_message(message_id):
 
 @app.post('/messages/<int:message_id>/unlike')
 def unlike_message(message_id):
-    """Like a message.
+    """Unlike a message.
 
     Check that the message was not written by the current user.
     Redirect to liked messages page on success.

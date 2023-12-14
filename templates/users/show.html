@@ -22,27 +22,34 @@
         <p>{{ message.text }}</p>
       </div>
       {% if g.user %}
-      <!-- deal with likes -->
-      {% if message.user_id != g.user.id %}
-        <div class="d-flex">
-        {% if message in g.user.liked_messages %}
-        <!-- liked -->
-            <div class="ml-auto p-2">
-              <button class="btn btn-primary">
-                <i class="bi bi-star-fill"></i>
-              </button>
-            </div>
-        <!-- not liked -->
-        {% else %}
-            <div class="ml-auto p-2">
-              <button class="btn btn-primary">
-                <i class="bi bi-star"></i>
-              </button>
-            </div>
-        </div>
+          <!-- deal with likes -->
+          <div class="messages-like">
+          {% if message.user_id != g.user.id %}
+            {% if message in g.user.liked_messages %}
+            <!-- liked -->
+              <form method="POST"
+                  action="/messages/{{ message.id }}/unlike"
+                  style="z-index: 1000;">
+                    {{ g.csrf_form.hidden_tag() }}
+                <button class="btn btn-primary" style="z-index: 1000;">
+                  <i class="bi bi-star-fill"></i>
+                </button>
+              </form>
+            <!-- not liked -->
+            {% else %}
+                <form method="POST"
+                  action="/messages/{{ message.id }}/like"
+                  style="z-index: 1000;">
+                    {{ g.csrf_form.hidden_tag() }}
+                <button class="btn btn-primary" style="z-index: 1000;">
+                  <i class="bi bi-star"></i>
+                </button>
+                </form>
+
+            {% endif %}
+          {% endif %}
+          </div>
         {% endif %}
-      {% endif %}
-    {% endif %}
     </li>
 
     {% endfor %}
