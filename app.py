@@ -384,6 +384,11 @@ def like_message(message_id):
 
         return redirect(f"/users/{g.user.id}/likes") #TODO: Write this
 
+@app.get('/users/<int:user_id>/likes')
+def show_liked_messages(user_id):
+    ...
+
+
 
 ##############################################################################
 # Homepage and error pages
