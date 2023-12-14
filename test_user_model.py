@@ -49,3 +49,60 @@ class UserModelTestCase(TestCase):
         # User should have no messages & no followers
         self.assertEqual(len(u1.messages), 0)
         self.assertEqual(len(u1.followers), 0)
+
+    def test_signup_positive(self):
+        """
+        Tests that signup method successfully creates a user given
+        valid credentials
+        """
+
+        u3 = User.signup("u3", "u3@email.com", "password", None)
+        db.session.commit()
+
+        self.assertTrue(u3)
+
+    def test_signup_negative_no_password(self):
+        """
+        Tests that signup method raises an error given no password
+        """
+
+        with self.assertRaises(ValueError):
+            u3 = User.signup("u3", "u3@email.com", None, None)
+
+    def test_signup_negative_no_email(self):
+        """Tests that signup method raises an error given no email and does not
+        create a user"""
+
+        u3 = User.signup("u3", None, "password", None)
+        db.session.commit()
+
+        self.assertRaises(ValueError)
+        self.assertFalse(u3)
+
+    def test_signup_negative_dupe(self):
+        ...
+
+    def test_default_values(self):
+        ...
+
+    def test_is_following_positive(self):
+        ...
+
+    def test_is_following_negative(self):
+        ...
+
+    def test_is_followed_by_positive(self):
+        ...
+
+    def test_is_followed_by_negative(self):
+        ...
+
+
+    def test_authenticate_positive(self):
+        ...
+
+    def test_authenticate_negative_wrong_password(self):
+        ...
+
+    def test_authenticate_negative_wrong_username(self):
+        ...
