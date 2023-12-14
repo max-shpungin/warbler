@@ -19,9 +19,17 @@ Right now, there is a link to logout in the base template, but we have a bug her
 
 ####BUGS
 
-Delete user breaks app
+ """"
+    header_image_url = db.Column(
+        db.String(255),
+        nullable=False,
+        default=DEFAULT_HEADER_IMAGE_URL,
+    )
+    """
 
-Header hero image displaying weird
+    header_image_url is missing from register form - intentional?
+
+    bio and location are also missing.
 
 ###
 
@@ -47,3 +55,5 @@ logout()
 start_following(),stop_following()
 refactored follow/unfollow buttons. These now live in separate templates and are
 referenced where needed in corresponding forms.
+
+updated profile() to update_profile()
