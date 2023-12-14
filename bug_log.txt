@@ -16,6 +16,13 @@ Right now, there is a link to logout in the base template, but we have a bug her
 
 ###
 
+###LIKES AND WHERE TO PUT THEM
+
+- models: new DONE
+- pages: home, user/detail, messages/show
+    - also need to add like count to user/detail, and link to new show likes page
+- routes: new
+
 
 ####BUGS
 
