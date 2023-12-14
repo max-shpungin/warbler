@@ -45,6 +45,11 @@ class UserUpdateForm(FlaskForm):
         validators=[InputRequired(), Email(), Length(max=50)],
     )
 
+    location = StringField(
+        'Location',
+        validators=[Length(max=30)],
+    )
+
     password = PasswordField(
         'Password',
         validators=[InputRequired(), Length(min=6, max=50)],

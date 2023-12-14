@@ -6,7 +6,12 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, UserUpdateForm, CSRFForm
-from models import db, connect_db, User, Message
+from models import  (db,
+                    connect_db,
+                    User,
+                    Message,
+                    DEFAULT_IMAGE_URL, DEFAULT_HEADER_IMAGE_URL
+)
 
 load_dotenv()
 
@@ -39,14 +44,9 @@ def add_user_to_g():
 
 @app.before_request
 def add_csrf_form_to_g():
-    """If we're logged in, add curr user to Flask global."""
+    """Add CSRF form to g for every request"""
 
-    #TODO: Just add the form, no need to check session, fix docstring
-    if CURR_USER_KEY in session:
-        g.csrf_form = CSRFForm()
-
-    else:
-        g.csrf_form = None
+    g.csrf_form = CSRFForm()
 
 
 def do_login(user):
@@ -126,15 +126,16 @@ def login():
 def logout():
     """Handle logout of user and redirect to homepage."""
 
-    form = g.csrf_form #TODO: Add check for logged-in user
+    form = g.csrf_form
 
-    if form.validate_on_submit():
+    if not g.user or not form.validate_on_submit():
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    else:
         do_logout()
         flash("logged out")
         return redirect("/login")
-    else:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
 
 ##############################################################################
@@ -249,14 +250,16 @@ def update_profile():
     """Update profile for current user."""
     #Can store g.user in a variable here for better readability/easier to update later
     form = UserUpdateForm(obj=g.user)
-    #TODO: Labels!
     if form.validate_on_submit():
         if User.authenticate(g.user.username, form.password.data):
             try:
                 g.user.username = form.username.data
                 g.user.email = form.email.data
-                g.user.image_url = form.image_url.data #TODO: Check for defaults
-                g.user.header_image_url = form.header_image_url.data
+                g.user.location = form.location.data
+                g.user.image_url = form.image_url.data or DEFAULT_IMAGE_URL
+                g.user.header_image_url = (
+                    form.header_image_url.data or DEFAULT_HEADER_IMAGE_URL
+                )
                 g.user.bio = form.bio.data
 
                 db.session.commit()
@@ -343,14 +346,20 @@ def delete_message(message_id):
     Check that this message was written by the current user.
     Redirect to user page on success.
     """
-    #TODO: CSRF validation on this one, plus can check logged-in user is poster for message in url
-    if not g.user:
+
+
+    msg = Message.query.get_or_404(message_id)
+
+    if not g.user or (msg.user_id != g.user.id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    msg = Message.query.get_or_404(message_id)
-    db.session.delete(msg)
-    db.session.commit()
+
+    form = g.csrf_form
+
+    if form.validate_on_submit():
+        db.session.delete(msg)
+        db.session.commit()
 
     return redirect(f"/users/{g.user.id}")
 
