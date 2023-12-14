@@ -41,6 +41,7 @@ def add_user_to_g():
 def add_csrf_form_to_g():
     """If we're logged in, add curr user to Flask global."""
 
+    #TODO: Just add the form, no need to check session, fix docstring
     if CURR_USER_KEY in session:
         g.csrf_form = CSRFForm()
 
@@ -125,7 +126,7 @@ def login():
 def logout():
     """Handle logout of user and redirect to homepage."""
 
-    form = g.csrf_form
+    form = g.csrf_form #TODO: Add check for logged-in user
 
     if form.validate_on_submit():
         do_logout()
@@ -203,7 +204,7 @@ def start_following(follow_id):
 
     Redirect to following page for the current for the current user.
     """
-
+    #Could rearrange below to check NOT cases before valid cases, for security reasons
     form = g.csrf_form
 
     if not g.user:
@@ -246,15 +247,15 @@ def stop_following(follow_id):
 @app.route('/users/profile', methods=["GET", "POST"])
 def update_profile():
     """Update profile for current user."""
-
+    #Can store g.user in a variable here for better readability/easier to update later
     form = UserUpdateForm(obj=g.user)
-
+    #TODO: Labels!
     if form.validate_on_submit():
         if User.authenticate(g.user.username, form.password.data):
             try:
                 g.user.username = form.username.data
                 g.user.email = form.email.data
-                g.user.image_url = form.image_url.data
+                g.user.image_url = form.image_url.data #TODO: Check for defaults
                 g.user.header_image_url = form.header_image_url.data
                 g.user.bio = form.bio.data
 
@@ -342,7 +343,7 @@ def delete_message(message_id):
     Check that this message was written by the current user.
     Redirect to user page on success.
     """
-
+    #TODO: CSRF validation on this one, plus can check logged-in user is poster for message in url
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -373,12 +374,12 @@ def homepage():
 
         #get all the messages by time stamp
         messages = (Message
-                                .query
-                                .filter((Message.user_id.in_(followed_user_ids))
-                                         | (Message.user_id == g.user.id))
-                                .order_by(Message.timestamp.desc())
-                                .limit(100)
-                                .all())
+                            .query
+                            .filter((Message.user_id.in_(followed_user_ids))
+                                        | (Message.user_id == g.user.id))
+                            .order_by(Message.timestamp.desc())
+                            .limit(100)
+                            .all())
 
         return render_template('home.html', messages=messages)
 
