@@ -21,6 +21,28 @@
             </span>
         <p>{{ message.text }}</p>
       </div>
+      {% if g.user %}
+      <!-- deal with likes -->
+      {% if message.user_id != g.user.id %}
+        <div class="d-flex">
+        {% if message in g.user.liked_messages %}
+        <!-- liked -->
+            <div class="ml-auto p-2">
+              <button class="btn btn-primary">
+                <i class="bi bi-star-fill"></i>
+              </button>
+            </div>
+        <!-- not liked -->
+        {% else %}
+            <div class="ml-auto p-2">
+              <button class="btn btn-primary">
+                <i class="bi bi-star"></i>
+              </button>
+            </div>
+        </div>
+        {% endif %}
+      {% endif %}
+    {% endif %}
     </li>
 
     {% endfor %}

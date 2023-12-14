@@ -39,6 +39,14 @@
                 </a>
               </h4>
             </li>
+            <li class="stat">
+              <p class="small">Likes</p>
+              <h4>
+                <a href="/users/{{ g.user.id }}/likes">
+                  {{ g.user.liked_messages | length }}
+                </a>
+              </h4>
+            </li>
           </ul>
         </div>
       </div>
@@ -58,25 +66,17 @@
               <p>
                 {{ msg.text }}
           {% if g.user %}
-          <!-- deal with likes -->
           {% if msg.user_id != g.user.id %}
-            <!-- already liked -->
             {% if msg in g.user.liked_messages %}
-            <!-- needs unlike route -->
+            <!-- liked -->
                 <button class="btn btn-primary">
                   <i class="bi bi-star-fill"></i>
                 </button>
-
-
-            <!-- new like -->
+            <!-- not liked -->
             {% else %}
-              <form method="POST"
-              action="/messages/{{ msg.id }}/like">
-                {{ g.csrf_form.hidden_tag() }}
                 <button class="btn btn-primary">
                   <i class="bi bi-star"></i>
                 </button>
-              </form>
 
             {% endif %}
           {% endif %}
