@@ -174,7 +174,7 @@ class UserModelTestCase(TestCase):
 
         self.assertEqual(
             test_user_1,
-            User.authenticate(test_user_1.username, test_user_1.password)
+            User.authenticate(test_user_1.username, "password")
         )
 
     def test_authenticate_negative_wrong_password(self):

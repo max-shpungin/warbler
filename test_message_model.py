@@ -7,8 +7,9 @@
 
 import os
 from unittest import TestCase
+from datetime import datetime
 
-from models import db, User, Message, DEFAULT_IMAGE_URL,DEFAULT_HEADER_IMAGE_URL
+from models import db, User, Message, Like
 from sqlalchemy.exc import IntegrityError
 
 # BEFORE we import our app, let's set an environmental variable
@@ -36,6 +37,50 @@ db.drop_all()
 db.create_all()
 
 class MessageModelTestCase(TestCase):
+    def setUp(self):
+        Message.query.delete()
+        User.query.delete()
+
+        u1 = User.signup("u1", "u1@email.com", "password", None)
+        db.session.commit()
+
+       # breakpoint()
+
+        m1 = Message(text="test", user_id=u1.id)
+        db.session.add(m1)
+
+        db.session.commit()
+        self.u1_id = u1.id
+        self.m1_id = m1.id
+
+    def tearDown(self):
+        db.session.rollback()
+
+    def test_message_model(self):
+
+        m1 = Message.query.get(self.m1_id)
+
+     #   breakpoint()
+        self.assertEqual(m1.text, 'test')
+        self.assertEqual(m1.user_id, self.u1_id,)
+
+
+    def test_message_timestamp_exists(self):
+        m1 = Message.query.get(self.m1_id)
+
+
+
+        self.assertIsInstance(m1.timestamp, datetime)
+
+
+    def test_message_relationship_user(self):
+        """ Test user field can be accessed from related message """
+        ...
+    def test_message_must_be_created_by_existing_user(self):
+        """ message can only be created by an existing user """
+        ...
+
+class LikeModelTestCase(TestCase):
     def setUp(self):
         Message.query.delete()
         User.query.delete()

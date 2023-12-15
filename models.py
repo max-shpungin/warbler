@@ -190,6 +190,9 @@ class Message(db.Model):
         backref="liked_messages",
     )
 
+    def __repr__(self):
+        return f"<Message #{self.id}>"
+
 
 class Like(db.Model):
     """Connection of a message <-> liking_user."""
