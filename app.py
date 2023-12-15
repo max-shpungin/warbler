@@ -374,7 +374,6 @@ def delete_message(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
-#TODO: Add new message for liking own messages
 @app.post('/messages/<int:message_id>/like')
 def like_message(message_id):
     """Like a message.
@@ -387,8 +386,11 @@ def like_message(message_id):
 
     form = g.csrf_form
 
-    if not g.user or not form.validate_on_submit() or g.user.id == message.user_id:
+    if not g.user or not form.validate_on_submit():
         flash("Access unauthorized.", "danger")
+        return redirect("/")
+    elif g.user.id == message.user_id:
+        flash("Don't you think that's a little conceited?", "warning")
         return redirect("/")
     else:
         g.user.liked_messages.append(message)
@@ -408,8 +410,11 @@ def unlike_message(message_id):
 
     form = g.csrf_form
 
-    if not g.user or not form.validate_on_submit() or g.user.id == message.user_id:
+    if not g.user or not form.validate_on_submit():
         flash("Access unauthorized.", "danger")
+        return redirect("/")
+    elif g.user.id == message.user_id:
+        flash("Well... I believe in you tiger.", "danger")
         return redirect("/")
     else:
         g.user.liked_messages.remove(message)
