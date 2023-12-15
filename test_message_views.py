@@ -71,3 +71,60 @@ class MessageAddViewTestCase(MessageBaseViewTestCase):
 
     def test_delete_message(self):
         """Test that user can delete a message they wrote"""
+
+        with app.test_client() as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            resp = c.post(f'/messages/{self.m1_id}/delete')
+
+            self.assertEqual(resp.status_code, 302)
+
+            self.assertIsNone(Message.query
+                              .filter_by(id=self.m1_id)
+                              .one_or_none())
+
+    def test_cant_delete_others_messages(self):
+        """Test that users can't delete messages they didn't write"""
+
+        with app.test_client() as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            resp = c.post(f'/messages/{self.m2_id}/delete',
+                          follow_redirects=True)
+
+            self.assertEqual(resp.status_code, 200)
+
+            html = resp.get_data(as_text=True)
+
+            self.assertIn("Access unauthorized.", html)
+
+            self.assertIsNotNone(Message.query
+                              .filter_by(id=self.m2_id)
+                              .one_or_none())
+
+    def test_show_message(self):
+        """Test that a message displays"""
+
+        with app.test_client() as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            resp = c.get(f'/messages/{self.m1_id}')
+            self.assertEqual(resp.status_code, 200)
+
+            message = Message.query.get(self.m1_id)
+
+            html = resp.get_data(as_text=True)
+            self.assertIn(f"{message.text}", html)
+
+    def test_show_invalid_message(self):
+        """Check that messages that don't exist don't display"""
+
+        with app.test_client() as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            resp = c.get(f'/messages/0')
+            self.assertEqual(resp.status_code, 404)
