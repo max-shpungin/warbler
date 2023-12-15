@@ -8,7 +8,8 @@
 import os
 from unittest import TestCase
 
-from models import db, User, Message, Follow
+from models import db, User, Message, Follow, DEFAULT_IMAGE_URL,DEFAULT_HEADER_IMAGE_URL
+from sqlalchemy.exc import IntegrityError
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
@@ -24,6 +25,12 @@ from app import app
 # Create our tables (we do this here, so we only create the tables
 # once for all tests --- in each test, we'll delete the data
 # and create fresh new clean test data
+
+# Make Flask errors be real errors, rather than HTML pages with error info
+app.config['TESTING'] = True
+
+# This is a bit of hack, but don't use Flask DebugToolbar
+app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 
 db.drop_all()
 db.create_all()
@@ -73,20 +80,35 @@ class UserModelTestCase(TestCase):
         """Tests that signup method raises an error given no email and does not
         create a user"""
 
-        u3 = User.signup("u3", None, "password", None)
-        db.session.commit()
 
-        self.assertRaises(ValueError)
-        self.assertFalse(u3)
+        with self.assertRaises(IntegrityError):
+            u3 = User.signup("u3", None, "password", None)
+            db.session.commit()
 
     def test_signup_negative_dupe(self):
-        ...
+        with self.assertRaises(IntegrityError):
+            u3 = User.signup("u1", "u45@email.com", "passwordabc", None)
+            db.session.commit()
+
 
     def test_default_values(self):
-        ...
+        test_user = User.query.get(self.u1_id)
+        self.assertEqual(test_user.image_url, DEFAULT_IMAGE_URL)
+        self.assertEqual(test_user.header_image_url, DEFAULT_HEADER_IMAGE_URL)
+        self.assertEqual(test_user.bio, "")
+        self.assertEqual(test_user.location, "")
+
 
     def test_is_following_positive(self):
-        ...
+        #someone needs to follow someone
+
+        test_user_1 = User.query.get(self.u1_id)
+        test_user_2 = User.query.get(self.u2_id)
+
+        test_user_1.following.append(test_user_2)
+        db.session.commit()
+
+        self.assertTrue(test_user_1.is_following(test_user_2))
 
     def test_is_following_negative(self):
         ...
